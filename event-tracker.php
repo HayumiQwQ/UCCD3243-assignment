@@ -53,6 +53,9 @@ if ($res) {
 <body>
 <div class="container">
 	<h1>Event Tracker</h1>
+	<div class="actions" style="margin-bottom:1rem;">
+		<a class="btn" href="dashboard.php">&larr; Dashboard</a>
+	</div>
 
 	<?php if (!empty($_SESSION['flash'])): ?>
 		<?php $f = $_SESSION['flash']; unset($_SESSION['flash']); ?>
@@ -62,20 +65,7 @@ if ($res) {
 	<?php endif; ?>
 
 	<div class="panel">
-		<h2>Add Event</h2>
-		<form method="post" action="?action=add">
-			<label>Title<input name="event_name" required></label>
-			<label>Date and Time<input type="datetime-local" name="date_time" required></label>
-			<label>Location<input name="event_loc" required></label>
-			<label>Event Type<select name="event_type" required>
-				<option value="Event">Event</option>
-				<option value="Competition">Competition</option>
-				<option value="Workshop">Workshop</option>
-				<option value="Talks">Talk</option>
-			</select></label>
-			<label>Description<textarea name="description" required></textarea></label>
-			<div class="actions"><button type="submit">Add Event</button></div>
-		</form>
+		<div class="actions"><a class="btn" href="event-tracker-form.php">Add New Event</a></div>
 	</div>
 
 	<div class="panel">
@@ -96,7 +86,7 @@ if ($res) {
 						<td><?=htmlspecialchars($e['event_type'])?></td>
 						<td><?=nl2br(htmlspecialchars($e['description']))?></td>
 						<td class="nowrap">
-							<a class="btn" href="event-tracker-edit.php?id=<?=$e['id']?>">Edit</a>
+							<a class="btn" href="event-tracker-form.php?id=<?=$e['id']?>">Edit</a>
 							<a class="btn danger" href="?action=delete&id=<?=$e['id']?>" onclick="return confirm('Delete this event?')">Delete</a>
 						</td>
 					</tr>
