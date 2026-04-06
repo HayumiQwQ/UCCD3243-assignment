@@ -4,23 +4,6 @@ include 'auth.php';
 
 $action = $_GET['action'] ?? '';
 
-// Add event
-if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-	$event_name = $_POST['event_name'] ?? '';
-	$date_time = $_POST['date_time'] ?? '';
-	$event_loc = $_POST['event_loc'] ?? '';
-	$event_type = $_POST['event_type'] ?? '';
-	$description = $_POST['description'] ?? '';
-
-	$query = mysqli_prepare($con, 'INSERT INTO events (event_name, date_time, event_loc, event_type, description) VALUES (?, ?, ?, ?, ?)');
-	mysqli_stmt_bind_param($query, 'sssss', $event_name, $date_time, $event_loc, $event_type, $description);
-	mysqli_stmt_execute($query);
-	mysqli_stmt_close($query);
-	$_SESSION['flash'] = ['type' => 'success', 'msg' => 'Event added successfully.'];
-	header('Location: event-tracker.php');
-	exit;
-}
-
 // Delete event
 if ($action === 'delete' && isset($_GET['id'])) {
 	$id = (int)$_GET['id'];
@@ -33,9 +16,33 @@ if ($action === 'delete' && isset($_GET['id'])) {
 	exit;
 }
 
-// Fetch events
+// Search / filter / sort params
+$q = trim($_GET['q'] ?? '');
+$filter_type = $_GET['type'] ?? '';
+$sort = $_GET['sort'] ?? 'date_time';
+$order = strtolower($_GET['order'] ?? 'asc') === 'desc' ? 'DESC' : 'ASC';
+
+$allowed_sorts = ['event_name', 'date_time', 'event_loc', 'event_type'];
+if (!in_array($sort, $allowed_sorts)) $sort = 'date_time';
+
+// Build query with basic escaping (simple app; use prepared statements for stronger safety)
+$conds = [];
+if ($q !== '') {
+	$esc = mysqli_real_escape_string($con, $q);
+	$like = "%" . $esc . "%";
+	$conds[] = "(event_name LIKE '{$like}' OR event_loc LIKE '{$like}' OR description LIKE '{$like}')";
+}
+if ($filter_type !== '') {
+	$escType = mysqli_real_escape_string($con, $filter_type);
+	$conds[] = "event_type = '{$escType}'";
+}
+
+$sql = 'SELECT * FROM events';
+if (count($conds) > 0) $sql .= ' WHERE ' . implode(' AND ', $conds);
+$sql .= " ORDER BY {$sort} {$order}";
+
 $events = [];
-$res = mysqli_query($con, 'SELECT * FROM events');
+$res = mysqli_query($con, $sql);
 if ($res) {
 	while ($row = mysqli_fetch_assoc($res)) {
 		$events[] = $row;
@@ -66,6 +73,28 @@ if ($res) {
 
 	<div class="panel">
 		<div class="actions"><a class="btn" href="event-tracker-form.php">Add New Event</a></div>
+		<form method="get" class="filters">
+			<input type="text" name="q" placeholder="Search title, location, description" value="<?=htmlspecialchars($_GET['q'] ?? '')?>">
+			<select name="type">
+				<option value="">All types</option>
+				<option value="Event" <?= (isset($_GET['type']) && $_GET['type']==='Event') ? 'selected' : '' ?>>Event</option>
+				<option value="Competition" <?= (isset($_GET['type']) && $_GET['type']==='Competition') ? 'selected' : '' ?>>Competition</option>
+				<option value="Workshop" <?= (isset($_GET['type']) && $_GET['type']==='Workshop') ? 'selected' : '' ?>>Workshop</option>
+				<option value="Talks" <?= (isset($_GET['type']) && $_GET['type']==='Talks') ? 'selected' : '' ?>>Talk</option>
+			</select>
+			<select name="sort">
+				<option value="date_time" <?= (isset($_GET['sort']) && $_GET['sort']==='date_time') ? 'selected' : '' ?>>Date</option>
+				<option value="event_name" <?= (isset($_GET['sort']) && $_GET['sort']==='event_name') ? 'selected' : '' ?>>Title</option>
+				<option value="event_loc" <?= (isset($_GET['sort']) && $_GET['sort']==='event_loc') ? 'selected' : '' ?>>Location</option>
+				<option value="event_type" <?= (isset($_GET['sort']) && $_GET['sort']==='event_type') ? 'selected' : '' ?>>Type</option>
+			</select>
+			<select name="order">
+				<option value="asc" <?= (isset($_GET['order']) && $_GET['order']==='asc') ? 'selected' : '' ?>>Asc</option>
+				<option value="desc" <?= (isset($_GET['order']) && $_GET['order']==='desc') ? 'selected' : '' ?>>Desc</option>
+			</select>
+			<button class="btn" type="submit">Apply</button>
+			<a class="btn" href="event-tracker.php">Reset</a>
+		</form>
 	</div>
 
 	<div class="panel">
