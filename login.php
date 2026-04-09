@@ -38,7 +38,7 @@ if (isset($_POST['student_name'])){
     if($rows==1){ // rows == 1 if the username, password match to any of one rows in data table
         $_SESSION['student_name'] = $student_name; 
                 
-        header("Location: event-tracker.php"); 
+        header("Location: dashboard.php"); 
         exit(); 
     }else{ 
         echo "<div class='form'> 

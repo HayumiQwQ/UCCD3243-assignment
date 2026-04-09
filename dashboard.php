@@ -18,8 +18,9 @@ include 'auth.php';
     <div class="panel">
         <h2>Modules</h2>
         <ul style="list-style:none;padding:0;margin:0;">
-            <li style="margin-bottom:8px;"><a class="btn" href="event-tracker.php">Event Tracker</a></li>
-            <li style="margin-bottom:8px;"><a class="btn" href="achievement-tracker.php">Achievement Tracker</a></li>
+            <li style="margin-bottom:8px;"><a class="btn" href="event-tracker.php">Event Tracker</a></li><br>
+            <li style="margin-bottom:8px;"><a class="btn" href="achievement-tracker.php">Achievement Tracker</a></li><br>
+            <li style="margin-bottom:8px;"><a class="btn" href="merit-tracker.php">Merit Tracker</a></li><br>
         </ul>
     </div>
 
