@@ -29,6 +29,7 @@ include 'auth.php';
             <li style="margin-bottom:8px;"><a class="btn" href="event-tracker.php">Event Tracker</a></li><br>
             <li style="margin-bottom:8px;"><a class="btn" href="achievement-tracker.php">Achievement Tracker</a></li><br>
             <li style="margin-bottom:8px;"><a class="btn" href="merit-tracker.php">Merit Tracker</a></li><br>
+            <li style="margin-bottom:8px;"><a class="btn" href="club-tracker.php">Club Tracker</a></li>
         </ul>
     </div>
 
